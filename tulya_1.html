@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TULYA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Shippori+Mincho:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #ffffff;
+    --off-white: #f7f6f3;
+    --green: #22c55e;
+    --green-light: #dcfce7;
+    --green-mid: #86efac;
+    --green-dark: #15803d;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --font-display: 'DM Mono', monospace;
+    --font-body: 'DM Sans', sans-serif;
+    --font-ja: 'Shippori Mincho', serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--off-white);
+    color: var(--gray-900);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 52px 28px 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .header-left {}
+  .logo {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    color: var(--gray-900);
+  }
+  .logo span { color: var(--green); }
+  .tagline {
+    font-family: var(--font-ja);
+    font-size: 10px;
+    color: var(--gray-400);
+    margin-top: 3px;
+    letter-spacing: .05em;
+  }
+  .header-date {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--gray-400);
+    letter-spacing: .06em;
+    text-align: right;
+  }
+
+  /* ── Nav ── */
+  .nav {
+    display: flex;
+    gap: 0;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--gray-100);
+    margin-bottom: 0;
+  }
+  .nav-btn {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: .1em;
+    color: var(--gray-400);
+    padding: 10px 16px 10px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .2s, border-color .2s;
+  }
+  .nav-btn.active {
+    color: var(--gray-900);
+    border-bottom-color: var(--green);
+  }
+
+  /* ── Screen ── */
+  .screen { display: none; flex: 1; flex-direction: column; animation: fadeIn .25s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .content { padding: 28px 28px 40px; flex: 1; }
+
+  /* ── Setup Screen ── */
+  .setup-step { display: none; }
+  .setup-step.active { display: block; }
+
+  .step-label {
+    font-family: var(--font-display);
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  .step-title {
+    font-family: var(--font-ja);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .step-desc {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .field { margin-bottom: 20px; }
+  .field-label {
+    font-family: var(--font-display);
+    font-size: 9px;
+    letter-spacing: .12em;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+    display: block;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    font-family: var(--font-ja);
+    font-size: 15px;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color .2s, background .2s;
+    -webkit-appearance: none;
+  }
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--green);
+    background: var(--white);
+  }
+  textarea { resize: none; line-height: 1.6; }
+
+  .steps-grid { display: flex; flex-direction: column; gap: 8px; }
+  .step-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--gray-300);
+    width: 16px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: .15em;
+    cursor: pointer;
+    transition: all .2s;
+    margin-top: 8px;
+  }
+  .btn-primary {
+    background: var(--green);
+    color: white;
+  }
+  .btn-primary:active { transform: scale(.98); background: var(--green-dark); }
+  .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-500);
+  }
+  .btn-secondary:active { transform: scale(.98); }
+
+  /* ── Today Screen ── */
+  .ring-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 28px;
+  }
+  .ring-wrap { position: relative; width: 120px; height: 120px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--green-light); stroke-width: 10; }
+  .ring-fill {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
+  }
+  .ring-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .ring-pct {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--gray-900);
+    line-height: 1;
+  }
+  .ring-label {
+    font-family: var(--font-display);
+    font-size: 8px;
+    color: var(--gray-400);
+    letter-spacing: .1em;
+    margin-top: 2px;
+  }
+  .task-name {
+    font-family: var(--font-ja);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-top: 16px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .task-time {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--gray-400);
+    margin-top: 4px;
+    letter-spacing: .06em;
+  }
+  .think-badge {
+    margin-top: 10px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-family: var(--font-ja);
+    font-size: 11px;
+    color: var(--gray-500);
+    max-width: 90%;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--gray-100);
+    margin: 0 28px;
+  }
+
+  .steps-section { padding: 20px 28px; }
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--gray-400);
+    margin-bottom: 14px;
+  }
+
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 8px;
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .check-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-300);
+    background: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    -webkit-appearance: none;
+  }
+  .check-btn.done {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .check-btn.done::after {
+    content: '';
+    width: 6px; height: 10px;
+    border: 2px solid white;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    display: block;
+  }
+  .step-text {
+    font-family: var(--font-ja);
+    font-size: 15px;
+    color: var(--gray-900);
+    flex: 1;
+    line-height: 1.4;
+    transition: color .2s;
+  }
+  .step-text.done {
+    color: var(--gray-300);
+    text-decoration: line-through;
+  }
+  .step-time-tag {
+    font-family: var(--font-display);
+    font-size: 9px;
+    color: var(--green-dark);
+    background: var(--green-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: .05em;
+  }
+  .step-memo {
+    margin-left: 36px;
+  }
+  .step-memo input {
+    font-size: 12px;
+    padding: 7px 10px;
+    color: var(--gray-500);
+    background: var(--gray-50);
+  }
+  .step-memo input::placeholder { color: var(--gray-300); }
+
+  .step-name-input {
+    font-family: var(--font-ja);
+    font-size: 15px;
+    color: var(--gray-900);
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--green);
+    border-radius: 0;
+    padding: 2px 4px;
+    flex: 1;
+    outline: none;
+  }
+  .step-name-input.done {
+    color: var(--gray-300);
+    text-decoration: line-through;
+    border-bottom-color: var(--gray-200);
+  }
+  .edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    color: var(--gray-300);
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: color .15s;
+    -webkit-appearance: none;
+  }
+  .edit-btn:active { color: var(--green); }
+
+  .comment-section { padding: 4px 28px 28px; }
+  .comment-section textarea {
+    font-size: 13px;
+    min-height: 80px;
+    color: var(--gray-700);
+  }
+  .comment-section textarea::placeholder { color: var(--gray-300); }
+
+  /* ── Log Screen ── */
+  .log-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+    color: var(--gray-300);
+  }
+  .log-empty-icon {
+    font-family: var(--font-display);
+    font-size: 32px;
+    letter-spacing: .1em;
+  }
+  .log-empty-text {
+    font-family: var(--font-ja);
+    font-size: 13px;
+    color: var(--gray-400);
+  }
+
+  .log-list { display: flex; flex-direction: column; gap: 10px; }
+  .log-card {
+    background: var(--white);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .log-card:active { transform: scale(.98); border-color: var(--green); }
+  .log-ring-mini { flex-shrink: 0; }
+  .log-info { flex: 1; min-width: 0; }
+  .log-date {
+    font-family: var(--font-display);
+    font-size: 9px;
+    color: var(--gray-400);
+    letter-spacing: .08em;
+    margin-bottom: 4px;
+  }
+  .log-task {
+    font-family: var(--font-ja);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .log-think {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-ja);
+  }
+  .log-arrow {
+    font-size: 14px;
+    color: var(--gray-300);
+    flex-shrink: 0;
+  }
+
+  /* ── Detail Screen ── */
+  .detail-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--gray-500);
+    letter-spacing: .1em;
+    padding: 20px 28px 0;
+  }
+  .detail-back:active { color: var(--green); }
+
+  .detail-header {
+    padding: 16px 28px 20px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .detail-date {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--gray-400);
+    letter-spacing: .08em;
+    margin-bottom: 6px;
+  }
+  .detail-task {
+    font-family: var(--font-ja);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+  }
+  .detail-think {
+    font-family: var(--font-ja);
+    font-size: 12px;
+    color: var(--gray-500);
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    line-height: 1.6;
+  }
+  .detail-ring-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .detail-pct {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--gray-900);
+  }
+  .detail-pct-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--gray-400);
+    letter-spacing: .08em;
+  }
+  .detail-set-time {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--gray-400);
+    letter-spacing: .06em;
+    margin-top: 2px;
+  }
+
+  .detail-steps { padding: 20px 28px; }
+  .detail-step {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .detail-step:last-child { border-bottom: none; }
+  .detail-step-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .detail-step-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .detail-step-dot.done { background: var(--green); }
+  .detail-step-dot.todo { background: var(--gray-200); }
+  .detail-step-name {
+    font-family: var(--font-ja);
+    font-size: 14px;
+    flex: 1;
+  }
+  .detail-step-name.done { color: var(--gray-400); text-decoration: line-through; }
+  .detail-step-name.todo { color: var(--gray-900); }
+  .detail-step-time {
+    font-family: var(--font-display);
+    font-size: 9px;
+    color: var(--green-dark);
+    background: var(--green-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .detail-step-memo {
+    font-family: var(--font-ja);
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-left: 18px;
+    line-height: 1.5;
+  }
+  .detail-comment {
+    margin: 0 28px 40px;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .detail-comment-label {
+    font-family: var(--font-display);
+    font-size: 9px;
+    letter-spacing: .12em;
+    color: var(--gray-400);
+    margin-bottom: 8px;
+  }
+  .detail-comment-text {
+    font-family: var(--font-ja);
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.7;
+  }
+
+  /* ── Today empty state ── */
+  .today-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 40px 28px;
+    text-align: center;
+    gap: 12px;
+  }
+  .today-empty-logo {
+    font-family: var(--font-display);
+    font-size: 36px;
+    letter-spacing: .2em;
+    color: var(--gray-200);
+  }
+  .today-empty-logo span { color: var(--green-mid); }
+  .today-empty-text {
+    font-family: var(--font-ja);
+    font-size: 14px;
+    color: var(--gray-400);
+    line-height: 1.8;
+  }
+
+  /* scrollable */
+  .scrollable { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+
+  /* mini ring for log */
+  .mini-ring { position: relative; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">TUL<span>Y</span>A</div>
+      <div class="tagline">これが私の、一日の仕事です</div>
+    </div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="showScreen('today')" id="nav-today">TODAY</button>
+    <button class="nav-btn" onclick="showScreen('log')" id="nav-log">LOG</button>
+  </div>
+
+  <!-- ── TODAY SCREEN ── -->
+  <div class="screen active scrollable" id="screen-today">
+
+    <!-- Empty state -->
+    <div class="today-empty" id="today-empty">
+      <div class="today-empty-logo">TUL<span>Y</span>A</div>
+      <div class="today-empty-text">今日のコアタスクを<br>まだ設定していません</div>
+      <button class="btn btn-primary" style="max-width:240px;margin-top:8px" onclick="showSetup()">今日をセットする</button>
+    </div>
+
+    <!-- Active state -->
+    <div id="today-active" style="display:none">
+      <div class="ring-section">
+        <div class="ring-wrap">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="50"
+              stroke-dasharray="314"
+              stroke-dashoffset="314"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ringPct">0%</div>
+            <div class="ring-label">PROGRESS</div>
+          </div>
+        </div>
+        <div class="task-name" id="todayTaskName"></div>
+        <div class="task-time" id="todaySetTime"></div>
+        <div class="think-badge" id="todayThink" style="display:none"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="steps-section">
+        <div class="section-label">STEPS</div>
+        <div id="stepsList"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="comment-section">
+        <div class="section-label" style="margin-bottom:10px">COMMENT</div>
+        <textarea id="todayComment" rows="3" placeholder="今日の気づき、振り返りなど…" oninput="saveComment()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SETUP SCREEN ── -->
+  <div class="screen" id="screen-setup">
+    <div class="content">
+
+      <!-- Step 1: Think -->
+      <div class="setup-step active" id="setup-step1">
+        <div class="step-label">STEP 1 / 2 — THINK</div>
+        <div class="step-title">今日のthinkを<br>一言でまとめると？</div>
+        <div class="step-desc">スキップしてもOK。朝の頭の整理を一文で。</div>
+        <div class="field">
+          <input type="text" id="thinkInput" placeholder="例：今日は集中力を高めることに注力する" maxlength="100">
+        </div>
+        <button class="btn btn-primary" onclick="goToStep2()">次へ →</button>
+        <button class="btn btn-secondary" style="margin-top:8px" onclick="goToStep2()">スキップ</button>
+      </div>
+
+      <!-- Step 2: Task -->
+      <div class="setup-step" id="setup-step2">
+        <div class="step-label">STEP 2 / 2 — CORE TASK</div>
+        <div class="step-title">今日のコアタスクと<br>5つのステップを入力</div>
+        <div class="step-desc">午前中に完遂する、一つの仕事。</div>
+
+        <div class="field">
+          <label class="field-label">CORE TASK</label>
+          <input type="text" id="coreTaskInput" placeholder="例：提案書を作る" maxlength="50">
+        </div>
+
+        <div class="field">
+          <label class="field-label">5 STEPS</label>
+          <div class="steps-grid" id="stepsInputGrid"></div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveSetup()">今日をセット</button>
+        <button class="btn btn-secondary" style="margin-top:8px" onclick="backToStep1()">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOG SCREEN ── -->
+  <div class="screen scrollable" id="screen-log">
+    <div class="content">
+      <div id="logEmpty" class="log-empty">
+        <div class="log-empty-icon">—</div>
+        <div class="log-empty-text">ログはまだありません</div>
+      </div>
+      <div class="log-list" id="logList" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ── DETAIL SCREEN ── -->
+  <div class="screen scrollable" id="screen-detail">
+    <button class="detail-back" onclick="showScreen('log')">← LOG</button>
+    <div id="detailContent"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Supabase config ──
+const SUPABASE_URL = 'https://ghseypnzudxmmnppgxvs.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xdHj2n0xhhSX7WlcoRIF2Q_3jBQgFDI';
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || '',
+      ...options.headers
+    },
+    method: options.method || 'GET',
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  if (options.method === 'DELETE' || options.prefer === 'return=minimal') return;
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// ── State ──
+let state = {
+  today: null,
+  todayId: null,  // Supabase上のID
+  logs: [],
+  editingStep: null
+};
+
+// ── Today をSupabaseに保存 ──
+async function saveTodayRemote() {
+  if (!state.today) return;
+  const t = state.today;
+  const body = {
+    date: t.date,
+    think: t.think || null,
+    task_name: t.taskName,
+    set_time: t.setTime,
+    steps: t.steps,
+    comment: t.comment || null
+  };
+  if (state.todayId) {
+    // 既存レコードを更新
+    await sbFetch(`today?id=eq.${state.todayId}`, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body
+    });
+  } else {
+    // 新規作成
+    const result = await sbFetch('today', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=representation' },
+      body
+    });
+    if (result && result[0]) state.todayId = result[0].id;
+  }
+}
+
+async function loadTodayRemote() {
+  const data = await sbFetch(`today?date=eq.${todayStr()}&limit=1`);
+  if (data && data[0]) {
+    state.todayId = data[0].id;
+    return {
+      date: data[0].date,
+      think: data[0].think || '',
+      taskName: data[0].task_name,
+      setTime: data[0].set_time,
+      steps: data[0].steps,
+      comment: data[0].comment || ''
+    };
+  }
+  return null;
+}
+
+async function deleteTodayRemote() {
+  if (!state.todayId) return;
+  await sbFetch(`today?id=eq.${state.todayId}`, { method: 'DELETE' });
+  state.todayId = null;
+}
+
+// ── Date helpers ──
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function timeStr() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function formatDate(str) {
+  const [y,m,d] = str.split('-');
+  const days = ['日','月','火','水','木','金','土'];
+  const dow = days[new Date(str).getDay()];
+  return `${y}.${m}.${d} ${dow}`;
+}
+function updateHeaderDate() {
+  const d = new Date();
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  document.getElementById('headerDate').innerHTML =
+    `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}<br>${days[d.getDay()]}`;
+}
+
+// ── Midnight auto-save ──
+async function checkMidnight() {
+  if (!state.today) return;
+  if (state.today.date !== todayStr()) {
+    await archiveToday();
+  }
+}
+
+async function archiveToday() {
+  if (!state.today) return;
+  const t = state.today;
+  const done = t.steps.filter(s => s.done).length;
+  await sbFetch('logs', {
+    method: 'POST',
+    prefer: 'return=minimal',
+    body: {
+      date: t.date,
+      think: t.think || null,
+      task_name: t.taskName,
+      set_time: t.setTime,
+      steps: t.steps,
+      comment: t.comment || null,
+      progress: Math.round(done / 5 * 100)
+    }
+  });
+  await deleteTodayRemote();
+  state.today = null;
+  renderToday();
+  await loadLogs();
+}
+
+// ── Load logs from Supabase ──
+async function loadLogs() {
+  const data = await sbFetch('logs?order=date.desc&limit=100');
+  state.logs = (data || []).map(row => ({
+    id: row.id,
+    date: row.date,
+    think: row.think,
+    taskName: row.task_name,
+    setTime: row.set_time,
+    steps: row.steps,
+    comment: row.comment,
+    progress: row.progress
+  }));
+  renderLog();
+}
+
+// ── Screen nav ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const navBtn = document.getElementById('nav-' + name);
+  if (navBtn) navBtn.classList.add('active');
+}
+
+function showSetup() {
+  document.getElementById('setup-step1').classList.add('active');
+  document.getElementById('setup-step2').classList.remove('active');
+  document.getElementById('thinkInput').value = '';
+  document.getElementById('coreTaskInput').value = '';
+  buildStepInputs();
+  showScreen('setup');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+}
+
+function buildStepInputs() {
+  const grid = document.getElementById('stepsInputGrid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    grid.innerHTML += `
+      <div class="step-input-row">
+        <span class="step-num">${i}</span>
+        <input type="text" id="stepIn${i}" placeholder="ステップ ${i}" maxlength="40">
+      </div>`;
+  }
+}
+
+function goToStep2() {
+  document.getElementById('setup-step1').classList.remove('active');
+  document.getElementById('setup-step2').classList.add('active');
+  buildStepInputs();
+  setTimeout(() => document.getElementById('coreTaskInput').focus(), 100);
+}
+
+function backToStep1() {
+  document.getElementById('setup-step2').classList.remove('active');
+  document.getElementById('setup-step1').classList.add('active');
+}
+
+async function saveSetup() {
+  const taskName = document.getElementById('coreTaskInput').value.trim();
+  if (!taskName) { document.getElementById('coreTaskInput').focus(); return; }
+
+  const steps = [];
+  for (let i = 1; i <= 5; i++) {
+    const val = document.getElementById('stepIn' + i).value.trim();
+    steps.push({ name: val || `ステップ ${i}`, done: false, doneTime: null, memo: '' });
+  }
+
+  state.today = {
+    date: todayStr(),
+    think: document.getElementById('thinkInput').value.trim(),
+    taskName,
+    setTime: timeStr(),
+    steps,
+    comment: ''
+  };
+  await saveTodayRemote();
+  showScreen('today');
+  document.getElementById('nav-today').classList.add('active');
+  renderToday();
+}
+
+// ── Render Today ──
+function renderToday() {
+  const empty = document.getElementById('today-empty');
+  const active = document.getElementById('today-active');
+
+  if (!state.today) {
+    empty.style.display = 'flex';
+    active.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  active.style.display = 'block';
+
+  const t = state.today;
+  document.getElementById('todayTaskName').textContent = t.taskName;
+  document.getElementById('todaySetTime').textContent = `セット: ${t.setTime}`;
+
+  const thinkEl = document.getElementById('todayThink');
+  if (t.think) {
+    thinkEl.style.display = 'block';
+    thinkEl.textContent = `"${t.think}"`;
+  } else {
+    thinkEl.style.display = 'none';
+  }
+
+  const done = t.steps.filter(s => s.done).length;
+  const pct = Math.round(done / 5 * 100);
+  const circumference = 314;
+  const offset = circumference - (circumference * pct / 100);
+  document.getElementById('ringFill').style.strokeDashoffset = offset;
+  document.getElementById('ringPct').textContent = pct + '%';
+
+  const list = document.getElementById('stepsList');
+  list.innerHTML = '';
+  t.steps.forEach((step, i) => {
+    const editing = state.editingStep === i;
+    list.innerHTML += `
+      <div class="step-item">
+        <div class="step-row">
+          <button class="check-btn ${step.done ? 'done' : ''}" onclick="toggleStep(${i})"></button>
+          ${editing
+            ? `<input class="step-name-input ${step.done ? 'done' : ''}" id="stepNameEdit${i}"
+                value="${step.name}" maxlength="40"
+                onblur="saveStepName(${i})"
+                onkeydown="if(event.key==='Enter')saveStepName(${i})">`
+            : `<span class="step-text ${step.done ? 'done' : ''}">${step.name}</span>`
+          }
+          ${step.doneTime ? `<span class="step-time-tag">${step.doneTime}</span>` : ''}
+          ${!step.done ? `<button class="edit-btn" onclick="startEditStep(${i})" title="編集">✎</button>` : ''}
+        </div>
+        <div class="step-memo">
+          <input type="text" value="${step.memo}" placeholder="メモ・URL…"
+            oninput="saveStepMemo(${i}, this.value)" maxlength="200">
+        </div>
+      </div>`;
+  });
+
+  if (state.editingStep !== null && state.editingStep !== undefined) {
+    const el = document.getElementById('stepNameEdit' + state.editingStep);
+    if (el) { el.focus(); el.select(); }
+  }
+
+  document.getElementById('todayComment').value = t.comment || '';
+}
+
+function startEditStep(i) {
+  state.editingStep = i;
+  renderToday();
+}
+
+async function saveStepName(i) {
+  const el = document.getElementById('stepNameEdit' + i);
+  if (el) {
+    const val = el.value.trim();
+    if (val) state.today.steps[i].name = val;
+  }
+  state.editingStep = null;
+  await saveTodayRemote();
+  renderToday();
+}
+
+async function toggleStep(i) {
+  if (!state.today) return;
+  state.today.steps[i].done = !state.today.steps[i].done;
+  state.today.steps[i].doneTime = state.today.steps[i].done ? timeStr() : null;
+  await saveTodayRemote();
+  renderToday();
+}
+
+async function saveStepMemo(i, val) {
+  if (!state.today) return;
+  state.today.steps[i].memo = val;
+  await saveTodayRemote();
+}
+
+async function saveComment() {
+  if (!state.today) return;
+  state.today.comment = document.getElementById('todayComment').value;
+  await saveTodayRemote();
+}
+
+// ── Render Log ──
+function renderLog() {
+  const empty = document.getElementById('logEmpty');
+  const list = document.getElementById('logList');
+
+  if (state.logs.length === 0) {
+    empty.style.display = 'flex';
+    list.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display = 'flex';
+  list.innerHTML = '';
+
+  state.logs.forEach((log, i) => {
+    const pct = log.progress || 0;
+    const r = 18;
+    const circ = 2 * Math.PI * r;
+    const offset = circ - (circ * pct / 100);
+
+    list.innerHTML += `
+      <div class="log-card" onclick="showDetail(${i})">
+        <div class="log-ring-mini">
+          <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg)">
+            <circle cx="24" cy="24" r="${r}" fill="none" stroke="#dcfce7" stroke-width="5"/>
+            <circle cx="24" cy="24" r="${r}" fill="none" stroke="#22c55e" stroke-width="5"
+              stroke-dasharray="${circ.toFixed(1)}"
+              stroke-dashoffset="${offset.toFixed(1)}"
+              stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="log-info">
+          <div class="log-date">${formatDate(log.date)}</div>
+          <div class="log-task">${log.taskName}</div>
+          ${log.think ? `<div class="log-think">"${log.think}"</div>` : ''}
+        </div>
+        <div class="log-arrow">›</div>
+      </div>`;
+  });
+}
+
+// ── Detail ──
+function showDetail(i) {
+  const log = state.logs[i];
+  const pct = log.progress || 0;
+  const done = log.steps.filter(s => s.done).length;
+  const r = 28;
+  const circ = (2 * Math.PI * r).toFixed(1);
+  const offset = (circ - circ * pct / 100).toFixed(1);
+
+  let stepsHTML = '';
+  log.steps.forEach(s => {
+    stepsHTML += `
+      <div class="detail-step">
+        <div class="detail-step-row">
+          <div class="detail-step-dot ${s.done ? 'done' : 'todo'}"></div>
+          <div class="detail-step-name ${s.done ? 'done' : 'todo'}">${s.name}</div>
+          ${s.doneTime ? `<span class="detail-step-time">${s.doneTime}</span>` : ''}
+        </div>
+        ${s.memo ? `<div class="detail-step-memo">${s.memo}</div>` : ''}
+      </div>`;
+  });
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-date">${formatDate(log.date)}</div>
+      <div class="detail-task">${log.taskName}</div>
+      ${log.think ? `<div class="detail-think">"${log.think}"</div>` : ''}
+    </div>
+    <div class="detail-ring-row">
+      <svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg);flex-shrink:0">
+        <circle cx="32" cy="32" r="${r}" fill="none" stroke="#dcfce7" stroke-width="7"/>
+        <circle cx="32" cy="32" r="${r}" fill="none" stroke="#22c55e" stroke-width="7"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="detail-pct">${pct}%</div>
+        <div class="detail-pct-label">PROGRESS · ${done}/5</div>
+        <div class="detail-set-time">セット: ${log.setTime}</div>
+      </div>
+    </div>
+    <div class="detail-steps">
+      <div class="section-label">STEPS</div>
+      ${stepsHTML}
+    </div>
+    ${log.comment ? `
+    <div class="detail-comment">
+      <div class="detail-comment-label">COMMENT</div>
+      <div class="detail-comment-text">${log.comment}</div>
+    </div>` : ''}
+  `;
+
+  showScreen('detail');
+}
+
+// ── Init ──
+async function init() {
+  updateHeaderDate();
+
+  // 今日のデータをSupabaseから取得
+  const savedToday = await loadTodayRemote();
+  if (savedToday) {
+    if (savedToday.date === todayStr()) {
+      state.today = savedToday;
+    } else {
+      state.today = savedToday;
+      await archiveToday();
+    }
+  }
+
+  renderToday();
+  await loadLogs();
+}
+
+init();
+
+// 1分ごとに日付チェック
+setInterval(() => {
+  checkMidnight();
+  updateHeaderDate();
+}, 60000);
+</script>
+</body>
+</html>
