@@ -198,10 +198,10 @@
           <span class="task-name" id="todayTaskName"></span>
           <button class="edit-btn" onclick="startTodayEdit('taskName')">✎</button>
         </div>
-        <div id="taskNameEdit" style="display:none;margin-top:12px">
-          <input class="inline-input lg" id="taskNameInput"
-            onblur="saveTodayField('taskName')"
-            onkeydown="if(event.key==='Enter')saveTodayField('taskName')" maxlength="50">
+        <div id="taskNameEdit" style="display:none;margin-top:12px;align-items:center;gap:6px;justify-content:center">
+          <input class="inline-input lg" id="taskNameInput" maxlength="50">
+          <button class="edit-btn" onclick="saveTodayField('taskName')" style="color:var(--green);font-size:16px">✓</button>
+          <button class="edit-btn" onclick="cancelTodayEdit('taskName')" style="font-size:14px">✕</button>
         </div>
 
         <div class="task-time" id="todaySetTime"></div>
@@ -211,10 +211,10 @@
           <button class="edit-btn" onclick="startTodayEdit('think')">✎</button>
         </div>
         <button id="thinkAddBtn" class="add-btn" onclick="startTodayEdit('think')" style="display:none">+ think を追加</button>
-        <div id="thinkEdit" style="display:none;margin-top:8px">
-          <input class="inline-input sm" id="thinkEditInput" placeholder="thinkを一言で…" maxlength="100"
-            onblur="saveTodayField('think')"
-            onkeydown="if(event.key==='Enter')saveTodayField('think')">
+        <div id="thinkEdit" style="display:none;margin-top:8px;align-items:center;gap:4px;justify-content:center">
+          <input class="inline-input sm" id="thinkEditInput" placeholder="thinkを一言で…" maxlength="100">
+          <button class="edit-btn" onclick="saveTodayField('think')" style="color:var(--green);font-size:16px">✓</button>
+          <button class="edit-btn" onclick="cancelTodayEdit('think')" style="font-size:14px">✕</button>
         </div>
       </div>
 
@@ -419,14 +419,14 @@ async function saveSetup() {
 function startTodayEdit(field) {
   if (field === 'taskName') {
     document.getElementById('taskNameDisplay').style.display = 'none';
-    document.getElementById('taskNameEdit').style.display = 'block';
+    document.getElementById('taskNameEdit').style.display = 'flex';
     const el = document.getElementById('taskNameInput');
     el.value = state.today.taskName;
     setTimeout(() => { el.focus(); el.select(); }, 50);
   } else {
     document.getElementById('thinkDisplay').style.display = 'none';
     document.getElementById('thinkAddBtn').style.display = 'none';
-    document.getElementById('thinkEdit').style.display = 'block';
+    document.getElementById('thinkEdit').style.display = 'flex';
     const el = document.getElementById('thinkEditInput');
     el.value = state.today.think || '';
     setTimeout(() => { el.focus(); el.select(); }, 50);
@@ -445,6 +445,17 @@ async function saveTodayField(field) {
   }
   await saveTodayRemote();
   renderToday();
+}
+
+function cancelTodayEdit(field) {
+  if (field === 'taskName') {
+    document.getElementById('taskNameEdit').style.display = 'none';
+    document.getElementById('taskNameDisplay').style.display = 'flex';
+  } else {
+    document.getElementById('thinkEdit').style.display = 'none';
+    if (state.today.think) document.getElementById('thinkDisplay').style.display = 'flex';
+    else document.getElementById('thinkAddBtn').style.display = 'block';
+  }
 }
 
 // ── Render Today ──
@@ -485,7 +496,9 @@ function renderToday() {
         <div class="step-row">
           <button class="check-btn ${step.done ? 'done' : ''}" onclick="toggleStep(${i})"></button>
           ${editing
-            ? `<input class="step-name-input" id="stepNameEdit${i}" value="${step.name}" maxlength="40" onblur="saveStepName(${i})" onkeydown="if(event.key==='Enter')saveStepName(${i})">`
+            ? `<input class="step-name-input" id="stepNameEdit${i}" value="${step.name}" maxlength="40">
+               <button class="edit-btn" onclick="saveStepName(${i})" style="color:var(--green);font-size:16px">✓</button>
+               <button class="edit-btn" onclick="cancelStepEdit()">✕</button>`
             : `<span class="step-text ${step.done ? 'done' : ''}">${step.name}</span>`}
           ${step.doneTime ? `<span class="step-time-tag">${step.doneTime}</span>` : ''}
           ${!step.done ? `<button class="edit-btn" onclick="startEditStep(${i})">✎</button>` : ''}
@@ -503,6 +516,7 @@ function renderToday() {
 }
 
 function startEditStep(i) { state.editingStep = i; renderToday(); }
+function cancelStepEdit() { state.editingStep = null; renderToday(); }
 
 async function saveStepName(i) {
   const el = document.getElementById('stepNameEdit' + i);
@@ -601,7 +615,9 @@ function renderDetail() {
         <div class="detail-step-row">
           <div class="detail-step-dot ${s.done ? 'done' : 'todo'}"></div>
           ${editing
-            ? `<input class="edit-input" id="dStepEdit${si}" value="${s.name}" maxlength="40" style="font-size:14px" onblur="saveDetailStep(${si})" onkeydown="if(event.key==='Enter')saveDetailStep(${si})">`
+            ? `<input class="edit-input" id="dStepEdit${si}" value="${s.name}" maxlength="40" style="font-size:14px">
+               <button class="edit-btn" onclick="saveDetailStep(${si})" style="color:var(--green);font-size:16px">✓</button>
+               <button class="edit-btn" onclick="cancelDetailEdit()">✕</button>`
             : `<div class="detail-step-name ${s.done ? 'done' : 'todo'}">${s.name}</div>`}
           ${s.doneTime ? `<span class="detail-step-time">${s.doneTime}</span>` : ''}
           <button class="edit-btn" onclick="startDetailEdit('step',${si})">✎</button>
@@ -615,11 +631,19 @@ function renderDetail() {
       <div class="detail-date">${formatDate(log.date)}</div>
       <div class="detail-task-row">
         ${ef === 'taskName'
-          ? `<input class="edit-input" id="dTaskInput" value="${log.taskName}" maxlength="50" onblur="saveDetailField('taskName')" onkeydown="if(event.key==='Enter')saveDetailField('taskName')">`
+          ? `<div style="display:flex;align-items:center;gap:6px">
+               <input class="edit-input" id="dTaskInput" value="${log.taskName}" maxlength="50">
+               <button class="edit-btn" onclick="saveDetailField('taskName')" style="color:var(--green);font-size:16px">✓</button>
+               <button class="edit-btn" onclick="cancelDetailEdit()">✕</button>
+             </div>`
           : `<span class="detail-task">${log.taskName}</span><button class="edit-btn" onclick="startDetailEdit('field','taskName')">✎</button>`}
       </div>
       ${ef === 'think'
-        ? `<input class="edit-input" id="dThinkInput" value="${log.think || ''}" maxlength="100" placeholder="thinkを一言で…" onblur="saveDetailField('think')" onkeydown="if(event.key==='Enter')saveDetailField('think')">`
+        ? `<div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+             <input class="edit-input" id="dThinkInput" value="${log.think || ''}" maxlength="100" placeholder="thinkを一言で…">
+             <button class="edit-btn" onclick="saveDetailField('think')" style="color:var(--green);font-size:16px">✓</button>
+             <button class="edit-btn" onclick="cancelDetailEdit()">✕</button>
+           </div>`
         : log.think
           ? `<div class="detail-think-row"><div class="detail-think">"${log.think}"</div><button class="edit-btn" onclick="startDetailEdit('field','think')">✎</button></div>`
           : `<button class="add-btn" onclick="startDetailEdit('field','think')" style="margin-top:4px">+ think を追加</button>`}
@@ -642,7 +666,11 @@ function renderDetail() {
     <div class="detail-comment">
       <div class="detail-comment-label">COMMENT</div>
       ${ef === 'comment'
-        ? `<textarea class="edit-textarea" id="dCommentInput" onblur="saveDetailField('comment')">${log.comment || ''}</textarea>`
+        ? `<textarea class="edit-textarea" id="dCommentInput" rows="4">${log.comment || ''}</textarea>
+           <div style="display:flex;gap:8px;margin-top:8px">
+             <button class="edit-btn" onclick="saveDetailField('comment')" style="color:var(--green);font-size:16px">✓ 保存</button>
+             <button class="edit-btn" onclick="cancelDetailEdit()">✕ キャンセル</button>
+           </div>`
         : `<div class="detail-comment-body">
             <div class="detail-comment-text">${log.comment || '<span style="color:var(--gray-300)">なし</span>'}</div>
             <button class="edit-btn" onclick="startDetailEdit('field','comment')">✎</button>
@@ -658,6 +686,12 @@ function renderDetail() {
 function startDetailEdit(type, val) {
   if (type === 'field') { detailState.field = val; detailState.step = null; }
   else { detailState.step = val; detailState.field = null; }
+  renderDetail();
+}
+
+function cancelDetailEdit() {
+  detailState.field = null;
+  detailState.step = null;
   renderDetail();
 }
 
