@@ -156,6 +156,13 @@
   .today-empty-logo { font-family: var(--font-display); font-size: 36px; letter-spacing: .2em; color: var(--gray-200); }
   .today-empty-logo span { color: var(--green-mid); }
   .today-empty-text { font-family: var(--font-ja); font-size: 14px; color: var(--gray-400); line-height: 1.8; }
+
+  .submit-section { padding: 8px 28px 40px; }
+  .btn-submit { width: 100%; padding: 15px; border-radius: var(--radius); border: 1.5px solid var(--gray-200); background: var(--white); font-family: var(--font-display); font-size: 10px; letter-spacing: .15em; color: var(--gray-500); cursor: pointer; transition: all .2s; }
+  .btn-submit:active { background: var(--gray-50); border-color: var(--gray-300); transform: scale(.98); }
+
+  .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--gray-900); color: white; font-family: var(--font-ja); font-size: 13px; padding: 12px 24px; border-radius: 24px; opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; white-space: nowrap; z-index: 100; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -228,8 +235,14 @@
         <div class="section-label" style="margin-bottom:10px">COMMENT</div>
         <textarea id="todayComment" rows="3" placeholder="今日の気づき、振り返りなど…" oninput="saveComment()"></textarea>
       </div>
+      <div class="divider"></div>
+      <div class="submit-section">
+        <button class="btn-submit" onclick="submitDay()">今日を締める</button>
+      </div>
     </div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <!-- SETUP -->
   <div class="screen" id="screen-setup">
@@ -346,19 +359,35 @@ function updateHeaderDate() {
   document.getElementById('headerDate').innerHTML = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}<br>${days[d.getDay()]}`;
 }
 
-async function checkMidnight() {
-  if (state.today && state.today.date !== todayStr()) await archiveToday();
-}
-
-async function archiveToday() {
+async function submitDay() {
   if (!state.today) return;
   const t = state.today;
   const done = t.steps.filter(s => s.done).length;
-  await sbFetch('logs', { method: 'POST', prefer: 'return=minimal', body: { date: t.date, think: t.think || null, task_name: t.taskName, set_time: t.setTime, steps: t.steps, comment: t.comment || null, progress: Math.round(done / 5 * 100) } });
+  const isNewDay = t.date !== todayStr();
+
+  // ログに保存
+  await sbFetch('logs', { method: 'POST', prefer: 'return=minimal', body: {
+    date: t.date,
+    think: t.think || null,
+    task_name: t.taskName,
+    set_time: t.setTime,
+    steps: t.steps,
+    comment: t.comment || null,
+    progress: Math.round(done / 5 * 100)
+  }});
   await deleteTodayRemote();
   state.today = null;
-  renderToday();
+
   await loadLogs();
+
+  if (isNewDay) {
+    // 日付が変わっている → リセットして新しい日へ
+    renderToday();
+  } else {
+    // まだ今日 → メッセージを出してTODAY画面はリセット
+    renderToday();
+    showToast('今日もお疲れさまでした 🌙');
+  }
 }
 
 // ── Screen nav ──
@@ -716,20 +745,27 @@ async function saveDetailStep(si) {
   renderDetail();
 }
 
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
 // ── Init ──
 async function init() {
   updateHeaderDate();
   const saved = await loadTodayRemote();
   if (saved) {
-    if (saved.date === todayStr()) state.today = saved;
-    else { state.today = saved; await archiveToday(); }
+    state.today = saved;
+    // 日付が変わっていても自動処理はしない（ユーザーが締めるまで保持）
   }
   renderToday();
   await loadLogs();
 }
 
 init();
-setInterval(() => { checkMidnight(); updateHeaderDate(); }, 60000);
+setInterval(() => { updateHeaderDate(); }, 60000);
 </script>
 </body>
 </html>
